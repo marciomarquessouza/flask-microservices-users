@@ -29,3 +29,14 @@ services:
         condition: service_healthy
     links:
       - users-db
+
+  pgadmin:
+    container_name: pgadmincomp4
+    links:
+      - users-db:postgres
+    image: fenglc/pgadmin4
+    volumes:
+       - /tmp/data/pgadmin:/root/.pgadmin
+    ports:
+      - "5050:5050"
+    restart: unless-stopped
