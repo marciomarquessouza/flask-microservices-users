@@ -1,6 +1,6 @@
 #project/tests/basepy
 
-from flaks-testing import TestCase
+from flask_testing import TestCase
 
 from project import app, db
 
@@ -13,6 +13,6 @@ class BaseTestCase(TestCase):
         db.create_all()
         db.session.commit()
 
-    def tearDoen(self):
+    def tearDown(self):
         db.session.remove()
         db.drop_all()
