@@ -58,13 +58,27 @@ def add_user():
 @users_blueprint.route('/users/<user_id>',methods=['GET'])
 def get_single_user(user_id):
     """ Get a single user details """
-    user = User.query.filter_by(id=user_id).first()
-    response_object = {
-        'status' : 'success',
-        'data': {
-            'username': user.username,
-            'email': user.email,
-            'created_at': user.created_at
+    try:
+        user = User.query.filter_by(id=int(user_id)).first()
+        if not user:
+            response_object = {
+                'status':'fail',
+                'message':'User does not exist'
+            }
+            return jsonify(response_object),404
+        else:
+            response_object = {
+                'status' : 'success',
+                'data': {
+                    'username': user.username,
+                    'email': user.email,
+                    'created_at': user.created_at
+                }
+            }
+            return jsonify(response_object),200
+    except ValueError:
+        response_object = {
+            'status':'fail',
+            'message':'User format is not valid'
         }
-    }
-    return jsonify(response_object),200
+        return jsonify(response_object),404
