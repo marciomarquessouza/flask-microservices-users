@@ -118,3 +118,20 @@ class TestUserService(BaseTestCase):
             self.assertEqual(response.status_code,404)
             self.assertIn('User does not exist',data['message'])
             self.assertIn('fail',data['status'])
+
+    def test_add_more_than_one_users(self):
+        """Ensure that the system accept more than one register"""
+        add_user(username='marcio souza',email='marciomultimedia@gmail.com')
+        add_user(username='flavia monteiro',email='flavia.monteiro@gmail.com')
+        with self.client:
+            response = self.client.get('/users')
+            data = json.loads(response.data.decode())
+            self.assertEqual(response.status_code,200)
+            self.assertEqual(len(data['data']['users']),2)
+            self.assertTrue('created_at' in data['data']['users'][0])
+            self.assertTrue('created_at' in data['data']['users'][1])
+            self.assertIn('marcio souza',data['data']['users'][0]['username'] )
+            self.assertIn('marciomultimedia@gmail.com',data['data']['users'][0]['email'] )
+            self.assertIn('flavia monteiro',data['data']['users'][1]['username'] )
+            self.assertIn('flavia.monteiro@gmail.com',data['data']['users'][1]['email'] )
+            self.assertIn('success',data['status'])

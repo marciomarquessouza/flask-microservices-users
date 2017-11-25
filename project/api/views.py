@@ -14,8 +14,58 @@ def ping_pong():
         'message': 'pong!'
     })
 
+@users_blueprint.route('/users/<user_id>',methods=['GET'])
+def get_single_user(user_id):
+    """ Get a single user details """
+    try:
+        user = User.query.filter_by(id=int(user_id)).first()
+        if not user:
+            response_object = {
+                'status':'fail',
+                'message':'User does not exist'
+            }
+            return jsonify(response_object),404
+        else:
+            response_object = {
+                'status' : 'success',
+                'data': {
+                    'username': user.username,
+                    'email': user.email,
+                    'created_at': user.created_at
+                }
+            }
+            return jsonify(response_object),200
+    except ValueError:
+        response_object = {
+            'status':'fail',
+            'message':'User format is not valid'
+        }
+        return jsonify(response_object),404
+
+@users_blueprint.route('/users',methods=['GET'])
+def get_all_users():
+    """Get all users"""
+    users = User.query.all()
+    users_list = []
+    for user in users:
+        user_object = {
+            'id': user.id,
+            'username': user.username,
+            'email': user.email,
+            'created_at': user.created_at
+        }
+        users_list.append(user_object)
+    response_object = {
+        'status': 'success',
+        'data': {
+            'users' : users_list
+        }
+    }
+    return jsonify(response_object),200
+
 @users_blueprint.route('/users',methods=['POST'])
 def add_user():
+    """ Add an user """
     #Recovering the request data
     post_data = request.get_json()
 
@@ -54,31 +104,3 @@ def add_user():
             'message' : 'Invalid payload.'
         }
         return jsonify(response_object),400
-
-@users_blueprint.route('/users/<user_id>',methods=['GET'])
-def get_single_user(user_id):
-    """ Get a single user details """
-    try:
-        user = User.query.filter_by(id=int(user_id)).first()
-        if not user:
-            response_object = {
-                'status':'fail',
-                'message':'User does not exist'
-            }
-            return jsonify(response_object),404
-        else:
-            response_object = {
-                'status' : 'success',
-                'data': {
-                    'username': user.username,
-                    'email': user.email,
-                    'created_at': user.created_at
-                }
-            }
-            return jsonify(response_object),200
-    except ValueError:
-        response_object = {
-            'status':'fail',
-            'message':'User format is not valid'
-        }
-        return jsonify(response_object),404
